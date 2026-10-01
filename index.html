@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b7a3e" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Sunu Panier" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>Sunu Panier — Sauvons la nourriture au Sénégal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --green:#0b7a3e; --green-d:#075a2d; --sun:#f5b301; --red:#d6322f; --cream:#fbf6ea; --card:#fff; --ink:#1c2a20; --muted:#6f7a70; --line:rgba(28,42,32,.10);
+  --disp:'Bricolage Grotesque','DM Sans',system-ui,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px);
+}
+*{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:#e9e2cf;font-family:'DM Sans',sans-serif;color:var(--ink);display:flex;justify-content:center}
+h1,h2,h3,.disp{font-family:var(--disp);margin:0;letter-spacing:-.01em}
+.app{width:100%;max-width:430px;height:100%;background:var(--cream);position:relative;display:flex;flex-direction:column;overflow:hidden}
+@media(min-width:500px){.app{height:min(880px,100%);margin:auto;border-radius:30px;box-shadow:0 30px 70px -20px rgba(0,0,0,.35)}}
+.screen{flex:1;overflow-y:auto;padding:0 18px 100px;display:none}
+.screen.active{display:block}
+.hero{background:var(--green);color:#fff;margin:0 -18px;padding:22px 18px 26px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:var(--sun);opacity:.9}
+.hero>*{position:relative;z-index:1}
+.loc{font-size:.8rem;opacity:.85;display:flex;align-items:center;gap:6px}
+.hero h1{font-size:1.65rem;font-weight:800;margin:10px 0 6px;line-height:1.12;max-width:270px}
+.hero p{margin:0;font-size:.86rem;opacity:.9;max-width:260px}
+.search{margin-top:16px;background:#fff;color:var(--ink);border-radius:14px;padding:12px 14px;font-size:.88rem;display:flex;gap:8px;align-items:center;width:100%;border:none}
+.search input{border:none;outline:none;flex:1;font-family:inherit;font-size:.9rem;background:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:16px 0 6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink)}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 10px}
+.sec h2{font-size:1.1rem;font-weight:700}
+.sec span{font-size:.76rem;color:var(--muted)}
+.card{background:var(--card);border-radius:20px;border:1px solid var(--line);margin-bottom:14px;overflow:hidden;cursor:pointer;transition:transform .15s}
+.card:active{transform:scale(.985)}
+.cover{height:104px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative}
+.stock{position:absolute;left:12px;top:12px;background:#fff;border-radius:999px;font-size:.72rem;font-weight:700;padding:4px 10px}
+.stock.low{background:var(--red);color:#fff}
+.stock.out{background:#444;color:#fff}
+.cbody{padding:12px 14px 14px}
+.crow{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cname{font-weight:700;font-size:.98rem}
+.csub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.price{text-align:right;flex:none}
+.price b{font-family:var(--disp);font-size:1.05rem;color:var(--green)}
+.price s{display:block;font-size:.72rem;color:var(--muted)}
+.meta{display:flex;gap:12px;margin-top:10px;font-size:.76rem;color:var(--muted)}
+.tabbar{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;padding:8px 6px calc(10px + env(safe-area-inset-bottom,0px))}
+.tab{flex:1;border:none;background:none;font-family:inherit;font-size:.68rem;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:6px}
+.tab .e{font-size:1.25rem}
+.tab.on{color:var(--green)}
+.sheet-bg{position:absolute;inset:0;background:rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+.sheet-bg.open{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--cream);border-radius:26px 26px 0 0;max-height:88%;overflow-y:auto;transform:translateY(100%);transition:transform .28s ease;z-index:11;padding:0 18px 26px}
+.sheet.open{transform:none}
+.grab{width:40px;height:4px;border-radius:9px;background:var(--line);margin:10px auto 0}
+.shead{height:130px;margin:10px -18px 0;display:flex;align-items:center;justify-content:center;font-size:4rem}
+.sheet h2{font-size:1.4rem;font-weight:800;margin-top:14px}
+.tagrow{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.tag{font-size:.74rem;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-weight:600}
+.box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px;font-size:.86rem;line-height:1.45}
+.box h4{margin:0 0 6px;font-size:.84rem}
+.qty{display:flex;align-items:center;gap:14px}
+.qty button{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:#fff;font-size:1.1rem;cursor:pointer;font-family:inherit}
+.pay{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;cursor:pointer;background:#fff;font-size:.86rem;font-weight:600}
+.opt.on{border-color:var(--green);background:#eef8f1}
+.opt .dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--line)}
+.opt.on .dot{border-color:var(--green);background:radial-gradient(var(--green) 45%,transparent 50%)}
+.btn{width:100%;border:none;background:var(--green);color:#fff;font-family:var(--disp);font-weight:700;font-size:1rem;padding:15px;border-radius:16px;cursor:pointer;margin-top:16px}
+.btn:disabled{background:#b7c2ba;cursor:not-allowed}
+.btn.alt{background:var(--sun);color:var(--ink)}
+.order{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px}
+.code{font-family:var(--disp);font-size:2rem;font-weight:800;letter-spacing:.2em;background:var(--ink);color:var(--sun);text-align:center;border-radius:14px;padding:12px;margin:10px 0 6px}
+.empty{text-align:center;color:var(--muted);padding:60px 20px;font-size:.9rem}
+.empty .e{font-size:3rem}
+.imp{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.imp div{background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px}
+.imp b{display:block;font-family:var(--disp);font-size:1.7rem;color:var(--green)}
+.imp span{font-size:.78rem;color:var(--muted)}
+.toast{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translate(-50%,-140%);background:var(--ink);color:#fff;padding:11px 16px;border-radius:14px;font-size:.84rem;z-index:30;transition:transform .3s}
+.toast.show{transform:translate(-50%,0)}
+.banner{background:#fff3cf;border-radius:16px;padding:12px 14px;font-size:.82rem;margin-top:14px;display:flex;gap:10px}
+button.loc{background:rgba(255,255,255,.16);border:none;color:#fff;padding:7px 12px;border-radius:999px;font-family:inherit;cursor:pointer}
+.seg2{display:flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg2 button{border:none;background:none;padding:6px 12px;border-radius:999px;font-family:inherit;font-size:.76rem;font-weight:600;cursor:pointer;color:var(--muted)}
+.seg2 button.on{background:var(--ink);color:#fff}
+.map{background:#dfeee0;border-radius:20px;border:1px solid var(--line);overflow:hidden;aspect-ratio:1}
+.map svg{width:100%;height:100%;display:block}
+.maphint{font-size:.76rem;color:var(--muted);margin:8px 2px 14px}
+.swipe{position:relative;height:52px;background:#e6efe8;border-radius:16px;margin-top:10px;overflow:hidden;touch-action:none;user-select:none}
+.swipe .lab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.84rem;font-weight:700;color:var(--green-d);padding-left:44px}
+.swipe .knob{position:absolute;left:4px;top:4px;width:44px;height:44px;border-radius:12px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:grab;touch-action:none}
+.done{background:#eef8f1;border-radius:14px;padding:12px;text-align:center;font-weight:700;color:var(--green);margin-top:10px;font-size:.9rem}
+.inp{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-family:inherit;font-size:.92rem;background:#fff;color:var(--ink)}
+.lbl{font-size:.76rem;font-weight:700;margin:12px 0 5px;display:block}
+.mode{position:absolute;right:14px;top:14px;z-index:2}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="toast" id="toast"></div>
+
+  <!-- DECOUVRIR -->
+  <section class="screen active" id="s-home">
+    <div class="hero">
+      <button class="loc mode" id="tomerch">🏪 Commerçant</button>
+      <button class="loc" id="locbtn">📍 <span id="loctxt">Dakar · Plateau</span></button>
+      <h1>Nanga def ? Sauvons le bon plat du jour.</h1>
+      <p>Paniers surprise à prix doux près de chez vous.</p>
+      <label class="search">🔎<input id="q" placeholder="Boulangerie, thiéboudienne, hôtel…" /></label>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="sec"><h2>Près de vous</h2><div class="seg2"><button id="vl" class="on">Liste</button><button id="vm">Carte</button></div></div>
+    <div style="font-size:.76rem;color:var(--muted);margin:-4px 0 10px" id="count"></div>
+    <div id="mapwrap" style="display:none"></div>
+    <div id="list"></div>
+    <div class="banner" id="ramadan" hidden><span>🌙</span><div><b>Pendant le Ramadan</b> — les paniers « Ftour » sont disponibles dès 17h chez les restaurants partenaires.</div></div>
+  </section>
+
+  <!-- COMMANDES -->
+  <section class="screen" id="s-orders">
+    <h1 style="font-size:1.6rem;margin:26px 0 6px">Mes paniers</h1>
+    <div id="orders"></div>
+  </section>
+
+  <!-- IMPACT -->
+  <section class="screen" id="s-impact">
+    <h1 style="font-size:1.6rem;margin:26px 0 6px">Mon impact</h1>
+    <p style="color:var(--muted);font-size:.86rem;margin:0">Chaque panier sauvé, c'est un repas de moins à la poubelle.</p>
+    <div class="imp">
+      <div><b id="i-meals">0</b><span>repas sauvés (retraits validés)</span></div>
+      <div><b id="i-save">0</b><span>FCFA économisés</span></div>
+      <div><b id="i-co2">0</b><span>kg de CO₂ évités (estimation)</span></div>
+      <div><b id="i-shops">0</b><span>commerces soutenus</span></div>
+    </div>
+    <div class="banner"><span>🤝</span><div>Jërëjëf ! Vous soutenez les commerçants de votre quartier tout en réduisant le gaspillage.</div></div>
+  </section>
+
+  <nav class="tabbar">
+    <button class="tab on" data-s="home"><span class="e">🧺</span>Découvrir</button>
+    <button class="tab" data-s="orders"><span class="e">🎟️</span>Mes paniers</button>
+    <button class="tab" data-s="impact"><span class="e">🌍</span>Impact</button>
+  </nav>
+
+  <section class="screen" id="s-mtoday">
+    <div class="hero"><button class="loc mode" id="toclient">← Espace client</button>
+      <div class="loc">🏪 Espace commerçant</div>
+      <h1>Transformez vos invendus en revenus.</h1><p>Publiez votre panier surprise du jour en 30 secondes.</p></div>
+    <div class="box"><h4>Mon commerce</h4><select id="mshop" class="inp"></select></div>
+    <div class="box"><h4>Panier surprise du jour</h4>
+      <span class="lbl">Nombre de paniers disponibles</span>
+      <div class="qty"><button id="mq-">−</button><b id="mq">0</b><button id="mq+">+</button><span style="color:var(--muted);font-size:.78rem;margin-left:auto">0 = offre en pause</span></div>
+      <span class="lbl">Prix du panier (FCFA)</span><input class="inp" id="m-price" type="number" inputmode="numeric" />
+      <span class="lbl">Valeur initiale du contenu (FCFA)</span><input class="inp" id="m-orig" type="number" inputmode="numeric" />
+      <div style="font-size:.74rem;color:var(--muted);margin-top:6px">Le prix doit être au maximum la moitié de la valeur initiale.</div>
+      <span class="lbl">Créneau de retrait</span><select class="inp" id="m-pick"></select>
+      <button class="btn" id="m-save">Publier mon offre</button></div>
+  </section>
+  <section class="screen" id="s-mpick">
+    <h1 style="font-size:1.6rem;margin:26px 0 6px">Retraits</h1>
+    <div class="box" style="margin-top:8px"><h4>Valider un retrait</h4>
+      <div style="color:var(--muted);font-size:.8rem;margin-bottom:8px">Saisissez le code à 4 chiffres affiché sur le téléphone du client.</div>
+      <input class="inp" id="m-code" inputmode="numeric" maxlength="4" placeholder="Code du client" style="text-align:center;font-size:1.3rem;letter-spacing:.3em" />
+      <button class="btn" id="m-valid" style="margin-top:10px">Valider le retrait</button></div>
+    <div class="imp" id="m-stats"></div>
+    <div class="sec"><h2>Réservations</h2></div>
+    <div id="m-orders"></div>
+  </section>
+  <nav class="tabbar" id="mtabs" style="display:none">
+    <button class="tab on" data-s="mtoday"><span class="e">📦</span>Mon offre</button>
+    <button class="tab" data-s="mpick"><span class="e">✅</span>Retraits</button>
+  </nav>
+  <div class="sheet-bg" id="bg"></div>
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+const SHOPS=[
+ {id:1,name:"Boulangerie Le Fournil",cat:"Boulangerie",e:"🥖",bg:"#fde7b3",area:"Plateau",price:1500,orig:4500,left:4,pick:"18h30 – 19h30",desc:"Pain frais, croissants et viennoiseries invendus de la journée.",may:"Baguettes, croissants, pain au chocolat, parfois des beignets."},
+ {id:2,name:"Chez Tanti Awa",cat:"Restaurant",e:"🍲",bg:"#ffd9c9",area:"Médina",price:2000,orig:5500,left:2,pick:"15h00 – 16h00",desc:"Cuisine sénégalaise familiale : plats du midi non vendus.",may:"Thiéboudienne, yassa poulet ou mafé selon le jour, avec accompagnement."},
+ {id:3,name:"Pâtisserie Teranga",cat:"Pâtisserie",e:"🍰",bg:"#f9d6e4",area:"Mermoz",price:2500,orig:7000,left:5,pick:"19h00 – 20h00",desc:"Gâteaux, tartes et douceurs de la vitrine.",may:"Assortiment de gâteaux, cakes et biscuits du jour."},
+ {id:4,name:"Dibiterie Chez Ousmane",cat:"Restaurant",e:"🍖",bg:"#e9d3bd",area:"Ouakam",price:2500,orig:6000,left:0,pick:"21h00 – 22h00",desc:"Dibi grillé, oignons et pain en fin de service.",may:"Dibi de mouton ou poulet grillé, moutarde, oignons, pain."},
+ {id:5,name:"Hôtel Le Baobab · Buffet",cat:"Hôtel",e:"🍽️",bg:"#d5e8d4",area:"Almadies",price:4000,orig:12000,left:3,pick:"21h30 – 22h00",desc:"Le surplus du buffet du soir de l'hôtel, préparé le jour même.",may:"Plats chauds, salades, desserts variés du buffet."},
+ {id:6,name:"Marché Kermel · Fruits & légumes",cat:"Marché",e:"🥭",bg:"#fff0b8",area:"Kermel",price:1000,orig:3000,left:6,pick:"17h30 – 18h30",desc:"Fruits et légumes mûrs, moches mais délicieux, vendus en lot.",may:"Mangues, bananes, tomates, oignons, selon l'arrivage."},
+ {id:7,name:"Fast-food Le Bissap",cat:"Restaurant",e:"🍔",bg:"#ffe0c2",area:"Sacré-Cœur",price:1800,orig:4800,left:1,pick:"22h00 – 22h30",desc:"Burgers, wraps et frites de fin de service.",may:"Burger ou wrap + frites, jus de bissap si disponible."}
+];
+const CATS=["Tout","Boulangerie","Restaurant","Pâtisserie","Hôtel","Marché"];
+const PAY=[["wave","🌊 Wave"],["om","🟠 Orange Money"],["cash","💵 Payer au retrait"]];
+let cat="Tout",orders=[],cur=null,qty=1,pay="wave";
+const $=id=>document.getElementById(id), fcfa=n=>n.toLocaleString('fr-FR')+" FCFA";
+const tq=[];let tb=false;
+function toast(t){tq.push(t);if(!tb)nextToast()}
+function nextToast(){const t=tq.shift();if(!t){tb=false;return}tb=true;const e=$('toast');e.textContent=t;e.classList.add('show');setTimeout(()=>{e.classList.remove('show');setTimeout(nextToast,350)},2200)}
+
+function renderChips(){$('chips').innerHTML=CATS.map(c=>`<button class="chip ${c===cat?'on':''}" data-c="${c}">${c}</button>`).join('');
+ document.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{cat=b.dataset.c;renderChips();renderList()})}
+function renderList(){
+ const q=norm($('q').value);
+ const rows=SHOPS.filter(s=>(cat==="Tout"||s.cat===cat)&&norm(s.name+' '+s.desc+' '+s.cat+' '+s.area+' '+s.may).includes(q)).sort((a,b)=>dist(a)-dist(b));
+ $('count').textContent=rows.length+" commerces · triés par distance";
+ $('list').innerHTML=rows.length?rows.map(s=>`
+ <div class="card" data-id="${s.id}">
+  <div class="cover" style="background:${s.bg}">${s.e}
+   <span class="stock ${(s.left===0||over(s))?'out':s.left<=2?'low':''}">${s.left===0?'Épuisé':over(s)?'Créneau terminé':s.left<=2?'Plus que '+s.left:s.left+' paniers'}</span></div>
+  <div class="cbody"><div class="crow"><div><div class="cname">${s.name}</div><div class="csub">Panier surprise · ${s.cat}</div></div>
+  <div class="price"><b>${fcfa(s.price)}</b><s>${fcfa(s.orig)}</s></div></div>
+  <div class="meta"><span>🕒 ${s.pick}</span><span>📍 ${s.area} · ${kmTxt(s)}</span></div></div></div>`).join('')
+ :`<div class="empty"><div class="e">🔍</div>Aucun panier trouvé. Essayez une autre catégorie.</div>`;
+ document.querySelectorAll('.card').forEach(c=>c.onclick=()=>openSheet(+c.dataset.id));
+ drawMap(rows);
+}
+function openSheet(id){
+ cur=SHOPS.find(s=>s.id===id);qty=1;pay="wave";drawSheet();$('bg').classList.add('open');$('sheet').classList.add('open');
+}
+function drawSheet(){
+ const s=cur,out=s.left===0||over(s);
+ $('sheet').innerHTML=`<div class="grab"></div><div class="shead" style="background:${s.bg}">${s.e}</div>
+ <h2>${s.name}</h2>
+ <div class="tagrow"><span class="tag">${s.cat}</span><span class="tag">📍 ${s.area} · ${kmTxt(s)}</span><span class="tag">🕒 ${s.pick}</span></div>
+ <div class="box"><h4>À propos</h4>${s.desc}<br><a class="tag" style="display:inline-block;margin-top:10px;text-decoration:none;color:var(--green-d)" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${COORDS[s.id][0]},${COORDS[s.id][1]}">🧭 Itinéraire</a></div>
+ <div class="box"><h4>Que peut contenir votre panier ?</h4>${s.may}<br><span style="color:var(--muted)">C'est une surprise : le contenu varie selon les invendus du jour.</span></div>
+ <div class="box"><h4>Quantité</h4><div class="qty"><button id="m">−</button><b id="qv">${qty}</b><button id="p">+</button><span style="color:var(--muted);font-size:.78rem;margin-left:auto">${s.left} restant(s)</span></div></div>
+ <div class="box"><h4>Paiement</h4><div class="pay">${PAY.map(([k,l])=>`<div class="opt ${pay===k?'on':''}" data-k="${k}"><span class="dot"></span>${l}</div>`).join('')}</div></div>
+ <button class="btn" id="go" ${out?'disabled':''}>${out?(s.left>0?'Créneau terminé':'Épuisé aujourd\'hui'):'Réserver · '+fcfa(s.price*qty)}</button>`;
+ if(out)return;
+ $('m').onclick=()=>{if(qty>1){qty--;drawSheet()}};
+ $('p').onclick=()=>{if(qty<Math.min(s.left,3)){qty++;drawSheet()}else toast("Maximum 3 paniers par commande")};
+ document.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{pay=o.dataset.k;drawSheet()});
+ $('go').onclick=reserve;
+}
+function closeSheet(){$('bg').classList.remove('open');$('sheet').classList.remove('open')}
+$('bg').onclick=closeSheet;
+
+
+
+function go(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));$('s-'+s).classList.add('active');
+ document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.s===s))}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>go(t.dataset.s));
+
+const COORDS={1:[14.6685,-17.4335],2:[14.6820,-17.4500],3:[14.7100,-17.4680],4:[14.7230,-17.4890],5:[14.7450,-17.5150],6:[14.6690,-17.4310],7:[14.7180,-17.4650]};
+let me={lat:14.6708,lng:-17.4380,gps:false};
+function hav(a,b,c,d){const r=x=>x*Math.PI/180,A=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 12742*Math.asin(Math.sqrt(A))}
+function dist(s){const c=COORDS[s.id];return hav(me.lat,me.lng,c[0],c[1])}
+function kmTxt(s){const d=dist(s);return d<1?Math.round(d*100)*10+" m":d.toFixed(1)+" km"}
+function locate(silent){
+ if(!navigator.geolocation){if(!silent)toast("GPS indisponible sur cet appareil");return}
+ if(!silent)toast("Recherche de votre position…");
+ navigator.geolocation.getCurrentPosition(p=>{
+  me={lat:p.coords.latitude,lng:p.coords.longitude,gps:true};$('loctxt').textContent="Ma position (GPS)";renderList();
+  const near=Math.min(...SHOPS.map(dist));
+  toast(near>40?"Position trouvée. Les commerces de démo sont à Dakar.":"Position trouvée 📍");
+ },()=>{if(!silent)toast("Localisation refusée. Autorisez le GPS pour trier par distance.")},{enableHighAccuracy:true,timeout:8000});
+}
+$('locbtn').onclick=()=>locate(false);
+function setView(v){$('vl').classList.toggle('on',v==='list');$('vm').classList.toggle('on',v==='map');$('list').style.display=v==='list'?'block':'none';$('mapwrap').style.display=v==='map'?'block':'none'}
+$('vl').onclick=()=>setView('list');$('vm').onclick=()=>setView('map');
+function drawMap(rows){
+ if(!rows.length){$('mapwrap').innerHTML='<div class="empty"><div class="e">🔍</div>Aucun commerce à afficher.</div>';return}
+ const la=[me.lat,...rows.map(s=>COORDS[s.id][0])],lo=[me.lng,...rows.map(s=>COORDS[s.id][1])];
+ const a0=Math.min(...la),a1=Math.max(...la),o0=Math.min(...lo),o1=Math.max(...lo);
+ const X=o=>o1===o0?50:12+(o-o0)/(o1-o0)*76,Y=a=>a1===a0?50:12+(a1-a)/(a1-a0)*76;
+ const pins=rows.map(s=>{const c=COORDS[s.id],x=X(c[1]),y=Y(c[0]);return `<g data-id="${s.id}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="5" fill="${s.left?'#fff':'#ddd'}" stroke="#0b7a3e" stroke-width=".7"/><text x="${x}" y="${y+1.9}" font-size="5" text-anchor="middle">${s.e}</text><text x="${x}" y="${y+9.5}" font-size="3" text-anchor="middle" fill="#1c2a20" font-weight="700">${kmTxt(s)}</text></g>`}).join('');
+ const grid=[20,40,60,80].map(v=>`<line x1="${v}" y1="0" x2="${v}" y2="100" stroke="#fff" stroke-opacity=".55" stroke-width=".4"/><line x1="0" y1="${v}" x2="100" y2="${v}" stroke="#fff" stroke-opacity=".55" stroke-width=".4"/>`).join('');
+ $('mapwrap').innerHTML=`<div class="map"><svg viewBox="0 0 100 100">${grid}<circle cx="${X(me.lng)}" cy="${Y(me.lat)}" r="6" fill="#2a7de1" fill-opacity=".2"><animate attributeName="r" values="3;8;3" dur="2s" repeatCount="indefinite"/></circle><circle cx="${X(me.lng)}" cy="${Y(me.lat)}" r="2.4" fill="#2a7de1" stroke="#fff" stroke-width=".8"/>${pins}</svg></div><div class="maphint">🔵 Vous · ${me.gps?'position GPS active':'position par défaut (Dakar Plateau). Touchez le bouton 📍 en haut pour vous localiser.'} Schéma simplifié, non à l'échelle.</div>`;
+ document.querySelectorAll('#mapwrap [data-id]').forEach(g=>g.onclick=()=>openSheet(+g.dataset.id));
+}
+function reserve(){
+ const s=cur;s.left-=qty;
+ orders.unshift({shop:s,qty,pay,code:String(Math.floor(1000+Math.random()*9000)),total:s.price*qty,saved:(s.orig-s.price)*qty,done:false});
+ closeSheet();renderList();renderOrders();renderImpact();toast("Panier réservé ! Jërëjëf 🙏");go('orders');
+}
+function renderOrders(){
+ $('orders').innerHTML=orders.length?orders.map((o,i)=>`<div class="order"><div class="crow"><div><div class="cname">${o.shop.e} ${o.shop.name}</div>
+ <div class="csub">${o.qty} panier(s) · ${o.pay==='cash'?'À payer au retrait':'Payé via '+(o.pay==='wave'?'Wave':'Orange Money')}</div></div><b>${fcfa(o.total)}</b></div>
+ <div class="meta"><span>🕒 Retrait ${o.shop.pick}</span><span>📍 ${o.shop.area}</span></div>
+ <div class="code">${o.code}</div>
+ ${o.done?'<div class="done">✅ Panier récupéré · Bon appétit !</div>':`<div style="text-align:center;font-size:.76rem;color:var(--muted)">Sur place, montrez cet écran au commerçant, puis glissez pour valider devant lui.</div><div class="swipe" data-i="${i}"><div class="lab">Glissez pour valider le retrait</div><div class="knob">➜</div></div><a class="tag" style="display:inline-block;margin-top:10px;text-decoration:none;color:var(--green-d)" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${COORDS[o.shop.id][0]},${COORDS[o.shop.id][1]}">🧭 Itinéraire</a>`}</div>`).join('')
+ :`<div class="empty"><div class="e">🧺</div>Vous n'avez pas encore de panier.<br>Découvrez les offres près de chez vous.</div>`;
+ document.querySelectorAll('.swipe').forEach(sw=>{
+  const k=sw.querySelector('.knob'),i=+sw.dataset.i;let x0=null,dx=0;
+  k.onpointerdown=e=>{x0=e.clientX;k.setPointerCapture(e.pointerId)};
+  k.onpointermove=e=>{if(x0===null)return;dx=Math.max(0,Math.min(sw.clientWidth-52,e.clientX-x0));k.style.transform=`translateX(${dx}px)`};
+  const end=()=>{if(x0===null)return;x0=null;
+   if(dx>(sw.clientWidth-52)*.85){orders[i].done=true;renderOrders();renderImpact();toast("Retrait validé ✅ Merci d'avoir sauvé un panier !")}
+   else{k.style.transition='transform .2s';k.style.transform='';dx=0;setTimeout(()=>k.style.transition='',220)}};
+  k.onpointerup=end;k.onpointercancel=end;k.onlostpointercapture=end;
+ });
+}
+function renderImpact(){
+ const d=orders.filter(o=>o.done),meals=d.reduce((a,o)=>a+o.qty,0);
+ $('i-meals').textContent=meals;$('i-save').textContent=d.reduce((a,o)=>a+o.saved,0).toLocaleString('fr-FR');
+ $('i-co2').textContent=(meals*2.5).toFixed(1);$('i-shops').textContent=new Set(d.map(o=>o.shop.id)).size;
+}
+
+let mshop=1,mq=0;
+const PICKS=["15h00 – 16h00","17h30 – 18h30","18h30 – 19h30","19h00 – 20h00","21h00 – 22h00","22h00 – 22h30"];
+function setMode(m){const mm=m==='m';document.querySelector('nav.tabbar').style.display=mm?'none':'flex';$('mtabs').style.display=mm?'flex':'none';
+ document.querySelectorAll('#mtabs .tab').forEach((t,i)=>t.classList.toggle('on',i===0));go(mm?'mtoday':'home');if(mm)drawMerch(true)}
+$('tomerch').onclick=()=>setMode('m');$('toclient').onclick=()=>setMode('c');
+function curShop(){return SHOPS.find(x=>x.id===mshop)}
+function drawMerch(reset){
+ $('mshop').innerHTML=SHOPS.map(x=>`<option value="${x.id}" ${x.id===mshop?'selected':''}>${x.e} ${x.name}</option>`).join('');
+ if(reset){const s=curShop();mq=s.left;$('mq').textContent=mq;$('m-price').value=s.price;$('m-orig').value=s.orig;
+  $('m-pick').innerHTML=[...new Set([s.pick,...PICKS])].map(x=>`<option ${x===s.pick?'selected':''}>${x}</option>`).join('')}
+ drawPickups();
+}
+$('mshop').onchange=e=>{mshop=+e.target.value;drawMerch(true)};
+$('mq-').onclick=()=>{if(mq>0){mq--;$('mq').textContent=mq}};
+$('mq+').onclick=()=>{if(mq<30){mq++;$('mq').textContent=mq}};
+$('m-save').onclick=()=>{const s=curShop(),p=+$('m-price').value,o=+$('m-orig').value;
+ if(!(p>0&&o>0))return toast("Renseignez les deux prix");
+ if(p>o/2)return toast("Le prix doit être au maximum la moitié de la valeur initiale");
+ s.price=p;s.orig=o;s.left=mq;s.pick=$('m-pick').value;renderList();toast(mq?"Offre publiée ✅ Visible côté client":"Offre mise en pause")};
+function drawPickups(){
+ const os=orders.filter(o=>o.shop.id===mshop),d=os.filter(o=>o.done);
+ $('m-stats').innerHTML=`<div><b>${os.reduce((a,o)=>a+o.qty,0)}</b><span>paniers réservés</span></div><div><b>${os.filter(o=>!o.done).length}</b><span>en attente de retrait</span></div><div><b>${d.reduce((a,o)=>a+o.qty,0)}</b><span>paniers remis</span></div><div><b>${d.reduce((a,o)=>a+o.total,0).toLocaleString('fr-FR')}</b><span>FCFA encaissés</span></div>`;
+ $('m-orders').innerHTML=os.length?os.map(o=>`<div class="order"><div class="crow"><div><div class="cname">${o.qty} panier(s)</div><div class="csub">${o.pay==='cash'?'À payer au retrait':'Payé via '+(o.pay==='wave'?'Wave':'Orange Money')}</div></div><b>${fcfa(o.total)}</b></div><div class="csub" style="margin-top:8px">${o.done?'✅ Retiré':'⏳ En attente du client'}</div></div>`).join('')
+ :`<div class="empty"><div class="e">📭</div>Aucune réservation pour l'instant.<br>Réservez un panier côté client pour tester.</div>`;
+}
+$('m-valid').onclick=()=>{const c=$('m-code').value.trim(),o=orders.find(o=>o.shop.id===mshop&&!o.done&&o.code===c);
+ if(!o)return toast("Code invalide ou déjà utilisé");
+ o.done=true;$('m-code').value='';renderOrders();renderImpact();drawPickups();toast("Retrait validé ✅ Remettez le panier")};
+document.querySelectorAll('#mtabs .tab').forEach(t=>t.addEventListener('click',drawPickups));
+const SHOW_RAMADAN=false;   // true pendant le Ramadan
+const ENFORCE_SLOTS=false;  // true au vrai lancement : bloque la réservation après la fin du créneau
+$('ramadan').hidden=!SHOW_RAMADAN;
+const norm=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function over(s){if(!ENFORCE_SLOTS)return false;const m=s.pick.match(/–\s*(\d+)h(\d+)/);if(!m)return false;const n=new Date();return n.getHours()*60+n.getMinutes()>(+m[1])*60+(+m[2])}
+$('q').oninput=renderList;
+renderChips();renderList();renderOrders();renderImpact();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
